@@ -1,0 +1,7 @@
+#+title: Readme
+
+A command line tool to convert audio to toniefiles, a file format that could be played by the Toniebox(r) cloud player
+
+* License
+The software written be me is under GPLv2 only,
+the resampler.rs file is from subject to the terms of the Mozilla Public License, v. 2.0 and the copyright holder is The Project Symphonia Developers.

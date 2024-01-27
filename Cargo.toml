@@ -1,0 +1,19 @@
+[package]
+name = "rstoni"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "^4.0", features = ["derive", "cargo"] }
+anyhow = "*"
+toniefile = { git = "https://github.com/Schievel1/toniefile" }
+symphonia = { version = "0.5.3", features = ["all"] }
+rand = "*"
+rubato = "0.12.0"
+hound = "*"
+lazy_static = "1.4.0"
+log = { version = "0.4", features = ["release_max_level_info"] }
+pretty_env_logger = "0.4"
+arrayvec = "0.7.1"
+cpal = "0.13.3"
+rb = "0.3.2"
