@@ -13,14 +13,52 @@ use symphonia::core::{
 };
 use toniefile::Toniefile;
 
+pub fn get_styles() -> clap::builder::Styles {
+    clap::builder::Styles::styled()
+        .usage(
+            anstyle::Style::new()
+                .bold()
+                .underline()
+                .fg_color(Some(anstyle::Color::Ansi(anstyle::AnsiColor::Yellow))),
+        )
+        .header(
+            anstyle::Style::new()
+                .bold()
+                .underline()
+                .fg_color(Some(anstyle::Color::Ansi(anstyle::AnsiColor::Yellow))),
+        )
+        .literal(
+            anstyle::Style::new().fg_color(Some(anstyle::Color::Ansi(anstyle::AnsiColor::Green))),
+        )
+        .invalid(
+            anstyle::Style::new()
+                .bold()
+                .fg_color(Some(anstyle::Color::Ansi(anstyle::AnsiColor::Red))),
+        )
+        .error(
+            anstyle::Style::new()
+                .bold()
+                .fg_color(Some(anstyle::Color::Ansi(anstyle::AnsiColor::Red))),
+        )
+        .valid(
+            anstyle::Style::new()
+                .bold()
+                .underline()
+                .fg_color(Some(anstyle::Color::Ansi(anstyle::AnsiColor::Green))),
+        )
+        .placeholder(
+            anstyle::Style::new().fg_color(Some(anstyle::Color::Ansi(anstyle::AnsiColor::White))),
+        )
+}
+
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(author, version, about, long_about = None, styles=get_styles())]
 struct Args {
-    /// Input file
+    /// Input file (ogg, mp3... anything that the Rust Symphonia crate supports)
     input: PathBuf,
     /// Output file
     output: PathBuf,
-    /// Optional user comment to be added to the output file
+    /// Optional user comment to be added to the output file, can be passed multiple times
     #[clap(short = 'c', long)]
     comments: Option<Vec<String>>,
 }

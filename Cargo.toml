@@ -2,13 +2,19 @@
 name = "rstoni"
 version = "0.1.0"
 edition = "2021"
+description = "rstonie is a tool to create files that can be played on a Toniebox(r) cloud player"
+repository = "https://github.com/Schievel1/rstonie"
+categories = [ "command-line-utilities" ]
+authors = ["Pascal Jaeger <pascal.jaeger@leimstift.de>"]
+license = "GPL-2.0-only"
 
 [dependencies]
-clap = { version = "^4.0", features = ["derive", "cargo"] }
+anstyle = "1.0.2"
 anyhow = "^1.0"
-toniefile = { git = "https://github.com/Schievel1/toniefile" }
-symphonia = { version = "0.5.3", features = ["all"] }
+arrayvec = "0.7.1"
+clap = { version = "^4.0", features = ["derive", "cargo"] }
+lazy_static = "1.4.0"
 rand = "0.8.5"
 rubato = "0.12.0"
-lazy_static = "1.4.0"
-arrayvec = "0.7.1"
+symphonia = { version = "0.5.3", features = ["all"] }
+toniefile = { git = "https://github.com/Schievel1/toniefile" }
