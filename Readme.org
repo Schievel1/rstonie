@@ -26,3 +26,29 @@ Example:
 #+begin_src bash
 rstonie my_input.mp3 my_output_toniefile -c 'this is a user comment' -c 'this is another one'
 #+end_src
+
+* Installation
+** Using standalone binary
+The ~rstonie-linux-x86_64-vx.y.z~ attached to the release is statically bound with musl and should therefore run an any Linux that is not ancient. (And maybe also Mac, but I never tested this)
+So therefore just download this file, then make it executeable
+#+begin_src bash
+~/Downloads > chmod +x ./rstonie-linux-x86_64-vx.y.z #replace x.y.z with the current version
+#+end_src
+Then run it:
+#+begin_src bash
+
+~/Downloads > ./rstonie-linux-x86_64-vx.y.z
+error: the following required arguments were not provided:
+  <INPUT>
+  <OUTPUT>
+
+Usage: rstonie <INPUT> <OUTPUT>
+
+For more information, try '--help'.
+#+end_src
+
+** Compiling
+Get Rust ([[https://www.rust-lang.org/tools/install]]), then clone this repo, cd into it and do
+#+begin_src bash
+cargo install --path ./
+#+end_src
