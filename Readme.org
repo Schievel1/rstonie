@@ -5,3 +5,24 @@ A command line tool to convert audio to toniefiles, a file format that can be pl
 * License
 The software written by me is under GPLv2 only.
 The file ~resampler.rs~ is subject to the terms of the Mozilla Public License, v. 2.0 and the copyright holder is The Project Symphonia Developers.
+
+* Usage
+#+begin_src
+rstonie is a tool to create files that can be played on a Toniebox(r) cloud player
+
+Usage: rstoni [OPTIONS] <INPUT> <OUTPUT>
+
+Arguments:
+  <INPUT>   Input file (ogg, mp3... anything that the Rust Symphonia crate supports)
+  <OUTPUT>  Output file
+
+Options:
+  -c, --comments <COMMENTS>  Optional user comment to be added to the output file, can be passed multiple times
+  -h, --help                 Print help
+  -V, --version              Print version#+end_src
+#+end_src
+
+Example:
+#+begin_src bash
+rstonie my_input.mp3 my_output_toniefile -c 'this is a user comment' -c 'this is another one'
+#+end_src
