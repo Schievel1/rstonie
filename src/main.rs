@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
 use rand::Rng;
-use rstoni::resampler::Resampler;
+use rstonie::resampler::Resampler;
 use std::{fs::File, path::PathBuf};
 use symphonia::core::errors::Error;
 use symphonia::core::{

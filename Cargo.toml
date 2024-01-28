@@ -1,5 +1,5 @@
 [package]
-name = "rstoni"
+name = "rstonie"
 version = "0.1.0"
 edition = "2021"
 description = "rstonie is a tool to create files that can be played on a Toniebox(r) cloud player"

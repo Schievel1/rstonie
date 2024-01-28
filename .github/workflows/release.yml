@@ -1,0 +1,67 @@
+# first make a release, then this will run and make a statically linked musl binary and attach it to the
+# latest release tag
+# Set the permissions for the github token to permissive in the repos settings!
+#
+name: Release
+
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+*"]
+    
+  workflow_dispatch:
+  
+permissions: write-all
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  CARGO_TERM_COLOR: always
+
+jobs:       
+  linux:
+    name: linux
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fetch release version
+        run: |
+          echo "latest_tag=$(\
+          curl -sL https://api.github.com/repos/Schievel1/rstonie/releases/latest | \
+          jq -r ".tag_name")" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+      - name: Install musl dependencies
+        run: |
+          sudo apt-get install musl musl-dev musl-tools clang lld
+      - name: Install musl target
+        run: rustup update && rustup target add x86_64-unknown-linux-musl
+      - name: Build x86_64
+        run: cargo build --release --target=x86_64-unknown-linux-musl
+      - name: rename executeables
+        run: |
+          cp ./target/x86_64-unknown-linux-musl/release/rstonie ./rstonie-linux-x86_64-${{ env.latest_tag }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: rstonie-linux-x86_64-${{ env.latest_tag }}
+          path: ./rstonie-linux-x86_64-${{ env.latest_tag }}
+          
+  make-release:
+    permissions: write-all
+    if: ${{ always() }}
+    needs: linux
+    runs-on: ubuntu-latest
+    steps:
+    - name: Fetch release version
+      run: |
+          echo "latest_tag=$(\
+          curl -sL https://api.github.com/repos/Schievel1/rstonie/releases/latest | \
+          jq -r ".tag_name")" >> $GITHUB_ENV
+    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@v3
+    - name: Display structure of downloaded files
+      run: ls -R
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: ${{ env.latest_tag }}
+          prerelease: false
+          files: |
+            ./rstonie-linux-x86_64-${{ env.latest_tag }}

@@ -10,7 +10,7 @@ The file ~resampler.rs~ is subject to the terms of the Mozilla Public License, v
 #+begin_src
 rstonie is a tool to create files that can be played on a Toniebox(r) cloud player
 
-Usage: rstoni [OPTIONS] <INPUT> <OUTPUT>
+Usage: rstonie [OPTIONS] <INPUT> <OUTPUT>
 
 Arguments:
   <INPUT>   Input file (ogg, mp3... anything that the Rust Symphonia crate supports)
