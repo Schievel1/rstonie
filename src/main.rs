@@ -2,6 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 use rand::Rng;
 use rstonie::resampler::Resampler;
+use std::path::Path;
 use std::{fs::File, path::PathBuf};
 use symphonia::core::errors::Error;
 use symphonia::core::{
@@ -58,6 +59,9 @@ struct Args {
     input: PathBuf,
     /// Output file
     output: PathBuf,
+    /// Additional files to be added to the output file, in the order they are passed
+    #[clap(short = 'a', long = "add")]
+    extra_inputs: Option<Vec<PathBuf>>,
     /// Optional user comment to be added to the output file, can be passed multiple times
     #[clap(short = 'c', long)]
     comments: Option<Vec<String>>,
@@ -65,7 +69,48 @@ struct Args {
 
 fn main() -> Result<()> {
     let args = Args::parse();
-    let src = std::fs::File::open(&args.input)?;
+    let outfile = File::create(&args.output)?;
+
+    // create a Toniefile to write to later
+    let mut rnd = rand::thread_rng();
+    let audio_id = rnd.gen::<u32>();
+    let comments = args.comments.clone().unwrap_or_default();
+    let strcomments: Option<Vec<&str>> = if comments.is_empty() {
+        None
+    } else {
+        Some(comments.iter().map(AsRef::as_ref).collect())
+    };
+
+    let mut toniefile = Toniefile::new(outfile, audio_id, strcomments)?;
+
+    if !comments.is_empty() {
+        for comment in comments {
+            println!("ogg user comment: {}", comment);
+        }
+    }
+    // decode the first file and encode it
+    decode_encode(&args, &args.input, &mut toniefile)?;
+
+    // add additional tracks to the toniefile
+    for extra_input in args.extra_inputs.clone().unwrap_or_default() {
+        toniefile.new_chapter()?;
+        decode_encode(&args, &extra_input, &mut toniefile)?;
+    }
+
+    println!("all done");
+    toniefile.finalize()?;
+    println!("Toniefile written to {}", args.output.display());
+    println!("kkthxbye");
+    Ok(())
+}
+
+fn decode_encode(
+    args: &Args,
+    src: &Path,
+    toniefile: &mut Toniefile<File>,
+) -> Result<()> {
+    println!("Encoding input file: {}", src.display());
+    let src = std::fs::File::open(src)?;
 
     // Create the media source stream.
     let mss = MediaSourceStream::new(Box::new(src), Default::default());
@@ -99,18 +144,6 @@ fn main() -> Result<()> {
     // Store the track identifier, it will be used to filter packets.
     let track_id = track.id;
 
-    // create a Toniefile to write to later
-    let mut rnd = rand::thread_rng();
-    let audio_id = rnd.gen::<u32>();
-    let file = File::create(args.output)?;
-    let comments = args.comments.unwrap_or_default();
-    let strcomments: Option<Vec<&str>> = if comments.is_empty() {
-        None
-    } else {
-        Some(comments.iter().map(AsRef::as_ref).collect())
-    };
-    let mut toniefile = Toniefile::new(file, audio_id, strcomments)?;
-
     // create a resampler to convert to 48kHz
     let mut resampler: Option<Resampler<i16>> = None;
 
@@ -124,11 +157,6 @@ fn main() -> Result<()> {
         input_sample_rate, input_channels,
     );
 
-    if !comments.is_empty() {
-        for comment in comments {
-            println!("ogg user comment: {}", comment);
-        }
-    }
     println!("Track length: {} frames", tracklen);
 
     while let Ok(packet) = format.next_packet() {
@@ -175,8 +203,7 @@ fn main() -> Result<()> {
             }
         }
     }
-    toniefile.finalize()?;
     println!("\rProgress: 100%");
-    println!("Done");
+    println!("File done");
     Ok(())
 }
