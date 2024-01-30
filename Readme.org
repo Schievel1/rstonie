@@ -35,7 +35,7 @@ rstonie my_output_toniefile -d
 
 * Installation
 ** Using standalone binary
-The ~rstonie-linux-x86_64-vx.y.z~ attached to the release is statically bound with musl and should therefore run on any Linux that is not ancient. (And maybe also Mac, but I never tested this)
+The ~rstonie-linux-x86_64-vx.y.z~ attached to the release is statically bound with musl and should therefore run on any (x86_64)Linux that is not ancient. (And maybe also Intel-Macs, but I never tested this)
 So therefore just download this file, then make it executable
 #+begin_src bash
 ~/Downloads > chmod +x ./rstonie-linux-x86_64-vx.y.z #replace x.y.z with the current version
