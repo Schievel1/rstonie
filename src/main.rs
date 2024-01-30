@@ -89,12 +89,12 @@ fn main() -> Result<()> {
         }
     }
     // decode the first file and encode it
-    decode_encode(&args, &args.input, &mut toniefile)?;
+    decode_encode(&args.input, &mut toniefile)?;
 
     // add additional tracks to the toniefile
     for extra_input in args.extra_inputs.clone().unwrap_or_default() {
         toniefile.new_chapter()?;
-        decode_encode(&args, &extra_input, &mut toniefile)?;
+        decode_encode(&extra_input, &mut toniefile)?;
     }
 
     println!("all done");
@@ -105,23 +105,24 @@ fn main() -> Result<()> {
 }
 
 fn decode_encode(
-    args: &Args,
     src: &Path,
     toniefile: &mut Toniefile<File>,
 ) -> Result<()> {
     println!("Encoding input file: {}", src.display());
+
+    // if the input file has an extension, use it as a hint for the media format.
+    let mut hint = Hint::new();
+    if let Some(ext) = src.extension() {
+        if let Some(ext) = ext.to_str() {
+            hint.with_extension(ext);
+        }
+    }
+
     let src = std::fs::File::open(src)?;
 
     // Create the media source stream.
     let mss = MediaSourceStream::new(Box::new(src), Default::default());
 
-    // if the input file has an extension, use it as a hint for the media format.
-    let mut hint = Hint::new();
-    if let Some(ext) = args.input.extension() {
-        if let Some(ext) = ext.to_str() {
-            hint.with_extension(ext);
-        }
-    }
 
     let meta_opts: MetadataOptions = Default::default();
     let fmt_opts: FormatOptions = Default::default();
