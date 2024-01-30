@@ -4,20 +4,24 @@ use clap::Parser;
 use rand::Rng;
 use rstonie::decode_encode;
 use rstonie::Cli;
+use rstonie::TonieboxAudioFileHeaderWrapper;
 use std::fs::File;
-
 use toniefile::Toniefile;
+
 fn main() -> Result<()> {
     let args = Cli::parse();
 
     if args.output_args.dump_header {
         println!("dumping header of {}", args.input_args.input.display());
         let mut src = std::fs::File::open(&args.input_args.input)?;
-        let header = Toniefile::parse_header(&mut src)?;
-        println!("{:x?}", header);
+        let header = TonieboxAudioFileHeaderWrapper(Toniefile::parse_header(&mut src)?);
+        println!("{}", header);
         return Ok(());
     }
-    let output_path = args.output_args.output.context("Output file not provided")?;
+    let output_path = args
+        .output_args
+        .output
+        .context("Output file not provided")?;
     let outfile = File::create(&output_path)?;
 
     // create a Toniefile to write to later

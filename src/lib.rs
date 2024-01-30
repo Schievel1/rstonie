@@ -1,5 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
+use toniefile::toniehead::TonieboxAudioFileHeader;
+use std::fmt::{Display, Formatter};
 use std::path::Path;
 use std::{fs::File, path::PathBuf};
 use symphonia::core::errors::Error;
@@ -191,4 +193,18 @@ pub fn decode_encode(
     println!("\rProgress: 100%");
     println!("File done");
     Ok(())
+}
+
+pub struct TonieboxAudioFileHeaderWrapper(pub TonieboxAudioFileHeader);
+impl Display for TonieboxAudioFileHeaderWrapper {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!(
+            "SHA1: {:x?}\nAudio length (bytes): {}\nAudio id: {}\ntrack page nums: {:?}\n... and {} bytes of '0' as filling",
+            self.0.sha1_hash,
+            self.0.num_bytes,
+            self.0.audio_id,
+            self.0.track_page_nums,
+            self.0.fill.len()
+        ))
+    }
 }
