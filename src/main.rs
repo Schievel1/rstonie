@@ -1,14 +1,24 @@
+use anyhow::Context;
 use anyhow::Result;
 use clap::Parser;
 use rand::Rng;
 use rstonie::decode_encode;
-use rstonie::Args;
+use rstonie::Cli;
 use std::fs::File;
 
 use toniefile::Toniefile;
 fn main() -> Result<()> {
-    let args = Args::parse();
-    let outfile = File::create(&args.output)?;
+    let args = Cli::parse();
+
+    if args.output_args.dump_header {
+        println!("dumping header of {}", args.input_args.input.display());
+        let mut src = std::fs::File::open(&args.input_args.input)?;
+        let header = Toniefile::parse_header(&mut src)?;
+        println!("{:x?}", header);
+        return Ok(());
+    }
+    let output_path = args.output_args.output.context("Output file not provided")?;
+    let outfile = File::create(&output_path)?;
 
     // create a Toniefile to write to later
     let mut rnd = rand::thread_rng();
@@ -28,7 +38,7 @@ fn main() -> Result<()> {
         }
     }
     // decode the first file and encode it
-    decode_encode(&args.input, &mut toniefile)?;
+    decode_encode(&args.input_args.input, &mut toniefile)?;
 
     // add additional tracks to the toniefile
     for extra_input in args.extra_inputs.clone().unwrap_or_default() {
@@ -38,7 +48,7 @@ fn main() -> Result<()> {
 
     println!("all done");
     toniefile.finalize()?;
-    println!("Toniefile written to {}", args.output.display());
+    println!("Toniefile written to {}", output_path.display());
     println!("kkthxbye");
     Ok(())
 }

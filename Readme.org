@@ -10,24 +10,27 @@ The file ~resampler.rs~ is subject to the terms of the Mozilla Public License, v
 #+begin_src
 rstonie is a tool to create files that can be played on a Toniebox(r) cloud player
 
-Usage: rstonie [OPTIONS] <INPUT> <OUTPUT>
+Usage: rstonie [OPTIONS] <INPUT> <OUTPUT|--header>
 
 Arguments:
   <INPUT>   Input file (ogg, mp3... anything that the Rust Symphonia crate supports)
-  <OUTPUT>  Output file
+  [OUTPUT]  Output file
 
 Options:
+  -d, --header               Dump the header of the input file and exit
   -a, --add <EXTRA_INPUTS>   Additional files to be added to the output file, in the order they are passed
   -c, --comments <COMMENTS>  Optional user comment to be added to the output file, can be passed multiple times
   -h, --help                 Print help
   -V, --version              Print version
-  #+end_src
+#+end_src
 
 Example:
 #+begin_src bash
 rstonie my_input.mp3 my_output_toniefile -c 'this is a user comment' -c 'this is another one'
 # or with additional chapters
 rstonie my_input.mp3 my_output_toniefile -a second_chapter.ogg -a third_chapter.mp3
+# or dump the header the input file
+rstonie my_output_toniefile -d
 #+end_src
 
 * Installation

@@ -53,20 +53,39 @@ pub fn get_styles() -> clap::builder::Styles {
             anstyle::Style::new().fg_color(Some(anstyle::Color::Ansi(anstyle::AnsiColor::White))),
         )
 }
-
-#[derive(Parser, Debug)]
+use clap::Args;
+#[derive(Parser)]
 #[command(author, version, about, long_about = None, styles=get_styles())]
-pub struct Args {
-    /// Input file (ogg, mp3... anything that the Rust Symphonia crate supports)
-    pub input: PathBuf,
-    /// Output file
-    pub output: PathBuf,
+pub struct Cli {
+    #[command(flatten)]
+    pub input_args: InputArgs,
+    #[command(flatten)]
+    pub output_args: OutputArgs,
     /// Additional files to be added to the output file, in the order they are passed
-    #[clap(short = 'a', long = "add")]
+    #[clap(short = 'a', long = "add", requires = "out")]
     pub extra_inputs: Option<Vec<PathBuf>>,
     /// Optional user comment to be added to the output file, can be passed multiple times
-    #[clap(short = 'c', long)]
+    #[clap(short = 'c', long, requires = "out")]
     pub comments: Option<Vec<String>>,
+}
+
+#[derive(Args)]
+#[group(required = true)]
+pub struct InputArgs {
+    /// Input file (ogg, mp3... anything that the Rust Symphonia crate supports)
+    pub input: PathBuf,
+}
+
+#[derive(Args)]
+#[group(required = true)]
+pub struct OutputArgs {
+    /// Output file
+    #[arg(group = "out")]
+    pub output: Option<PathBuf>,
+    /// Dump the header of the input file and exit
+    #[clap(short = 'd', long = "header", group = "out")]
+    pub dump_header: bool,
+
 }
 
 pub fn decode_encode(
