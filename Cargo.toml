@@ -17,4 +17,4 @@ lazy_static = "1.4.0"
 rand = "0.8.5"
 rubato = "0.12.0"
 symphonia = { version = "0.5.3", features = ["all"] }
-toniefile = { git = "https://github.com/Schievel1/toniefile" }
+toniefile = { git = "https://github.com/Schievel1/toniefile", rev = "ea393570e013e7a39eba608328e9c06538a5a406" }
