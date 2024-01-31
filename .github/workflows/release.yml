@@ -17,6 +17,54 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:       
+  macos:
+    name: macos
+    runs-on: macos-11
+
+    steps:
+      - name: Fetch release version
+        run: |
+          echo "latest_tag=$(\
+          curl -sL https://api.github.com/repos/Schievel1/rstonie/releases/latest | \
+          jq -r ".tag_name")" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+      - name: Install ARM target
+        run: rustup update && rustup target add aarch64-apple-darwin
+      - name: Build ARM
+        run: cargo build --release --target=aarch64-apple-darwin
+      - name: rename executeable
+        run: |
+          cp ./target/aarch64-apple-darwin/release/rstonie ./rstonie-macos-aarch64-${{ env.latest_tag }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: rstonie-macos-aarch64-${{ env.latest_tag }}
+          path: ./rstonie-macos-aarch64-${{ env.latest_tag }}
+          
+  windows:
+    name: windows
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Fetch release version
+        run: |
+          echo "latest_tag=$(\
+          curl -sL https://api.github.com/repos/Schievel1/rstonie/releases/latest | \
+          jq -r ".tag_name")" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+      - name: Build
+        run: cargo build --release
+      - name: rename executeable
+        run: |
+          cp ./target/release/rstonie.exe ./rstonie-windows-x86_64-${{ env.latest_tag }}.exe
+      - uses: actions/upload-artifact@v3
+        with:
+          name: rstonie-windows-x86_64-${{ env.latest_tag }}.exe
+          path: ./rstonie-windows-x86_64-${{ env.latest_tag }}.exe
+
   linux:
     name: linux
     runs-on: ubuntu-latest
@@ -46,7 +94,7 @@ jobs:
   make-release:
     permissions: write-all
     if: ${{ always() }}
-    needs: linux
+    needs: [linux, windows, macos]
     runs-on: ubuntu-latest
     steps:
     - name: Fetch release version
@@ -65,3 +113,5 @@ jobs:
           prerelease: false
           files: |
             ./rstonie-linux-x86_64-${{ env.latest_tag }}
+            ./rstonie-windows-x86_64-${{ env.latest_tag }}.exe
+            ./rstonie-macos-aarch64-${{ env.latest_tag }}
